@@ -78,3 +78,6 @@ def register(request):
 def logout(request):
     auth.logout(request)
     return redirect('login')
+
+def delete(request):
+    return redirect('chatbot')
