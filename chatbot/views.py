@@ -7,10 +7,13 @@ from django.contrib.auth.models import User
 from .models import Chat
 
 from django.utils import timezone
+
+
+from .api_keys import API_KEY # use your own API key :P
 # Create your views here.
 
-apikey='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'
-openai.api_key=apikey
+
+openai.api_key=API_KEY
 
 def ask_openai(message):
     response =openai.ChatCompletion.create(
