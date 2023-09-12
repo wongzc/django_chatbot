@@ -9,21 +9,21 @@ from .models import Chat
 from django.utils import timezone
 # Create your views here.
 
-apikey='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'
+apikey=''
 openai.api_key=apikey
 
 def ask_openai(message):
-    response =openai.Completion.create(
-        model="text-davinci-003",
-        prompt=message,
-        max_tokens=150,
-        n=1,
-        stop=None,
-        temperature=0.7,
+    response =openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role":"system", "content":"You are a helpful assistant."},
+            {"role": "user", "content": message},
+        ]
     )
     print(response)
 
-    answer =response.choices[0].text.strip()
+    #answer =response.choices[0].text.strip()
+    answer=response.choices[0].message.content.strip()
     return answer
 
 def chatbot(request):
