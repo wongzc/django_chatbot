@@ -9,7 +9,7 @@ from .models import Chat
 from django.utils import timezone
 # Create your views here.
 
-apikey=''
+apikey='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'
 openai.api_key=apikey
 
 def ask_openai(message):
@@ -80,4 +80,8 @@ def logout(request):
     return redirect('login')
 
 def delete(request):
-    return redirect('chatbot')
+    chat=Chat.objects.filter(user=request.user)
+    if request.method =='POST':
+        chat.delete()
+        return redirect('chatbot')
+    return render(request, 'delete.html')
