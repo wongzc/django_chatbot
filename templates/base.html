@@ -76,8 +76,9 @@
       }
   
       .left {
-        display: flex;
-      justify-content: flex-start;
+        flex: 1;
+        border-radius: 0;
+        border-right: none;
       }
   
     </style>
@@ -86,7 +87,7 @@
     <div class="card-header bg-primary text-white"><h1>Django Chatbot</h1></div>
     {% if user.is_authenticated %}
     <div class="card-header bg-primary text-white">
-      <div class="input-group"><b class="message-input">Welcome, {{request.user}}</b><a class="right" style="color:white" href="logout">Logout</a></div>
+      <div class="input-group"><b class="left">Welcome, {{request.user}}</b><a class="right" style="color:white" href="logout">Logout</a></div>
     </div>
     
     {% else %}

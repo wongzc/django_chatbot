@@ -36,6 +36,8 @@ def chatbot(request):
     }
     if request.method=='POST':
         message=request.POST.get('message')
+        selectedModel=request.POST.get('selectedModel')
+        print(selectedModel)
         response=ask_openai(message)
 
         chat=Chat(user=request.user, message=message, response=response, created_at=timezone.now)

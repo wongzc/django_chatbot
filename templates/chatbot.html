@@ -56,6 +56,14 @@
     {%csrf_token%}
     
     <div class="input-group">
+      <select id="dropdown" name="model">
+        <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+        <option value="gpt-4">gpt-4</option>
+        <option value="ada">ada</option>
+        <option value="babbage">babbage</option>
+        <option value="curie">curie</option>
+        <option value="davinci">davinci</option>
+    </select>
       <div class="input-group-append">
         <a class="btn btn-primary btn-send text-white" href="{% url 'delete' %}">
           Clear chat
@@ -74,6 +82,8 @@
   const messagesList = document.querySelector('.messages-list');
   const messageForm = document.querySelector('.message-form');
   const messageInput = document.querySelector('.message-input');
+  const dropdown = document.getElementById("dropdown");
+  const selectedModel = dropdown.options[dropdown.selectedIndex].value;
 
   messageForm.addEventListener('submit', (event)=>{
     event.preventDefault();
@@ -88,7 +98,7 @@
     messageItem.innerHTML=`
     <div class="message-text">
       <div class="message-sender">
-        <b>{{request.user}}<b>
+        <a>{{request.user}}<a>
       </div>
       <div class="message-content">
         ${message}
@@ -103,7 +113,8 @@
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
         'csrfmiddlewaretoken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-        'message': message
+        'message': message,
+        'selectedModel': selectedModel,
       })
     })
     
