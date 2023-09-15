@@ -57,12 +57,13 @@
     
     <div class="input-group">
       <select id="dropdown" name="model">
-        <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
         <option value="gpt-4">gpt-4</option>
-        <option value="ada">ada</option>
-        <option value="babbage">babbage</option>
-        <option value="curie">curie</option>
-        <option value="davinci">davinci</option>
+        <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+        
+        <option value="text-ada-001">text-ada-001</option>
+        <option value="text-babbage-001">text-babbage-001</option>
+        <option value="text-curie-001">text-curie-001</option>
+        <option value="text-davinci-003">text-davinci-003</option>
     </select>
       <div class="input-group-append">
         <a class="btn btn-primary btn-send text-white" href="{% url 'delete' %}">
@@ -82,8 +83,11 @@
   const messagesList = document.querySelector('.messages-list');
   const messageForm = document.querySelector('.message-form');
   const messageInput = document.querySelector('.message-input');
-  const dropdown = document.getElementById("dropdown");
-  const selectedModel = dropdown.options[dropdown.selectedIndex].value;
+  var selectedModel;
+
+  function getSelectedValue() {
+    
+        }
 
   messageForm.addEventListener('submit', (event)=>{
     event.preventDefault();
@@ -92,6 +96,10 @@
     if (message.length === 0) {
       return;
     } //makesure not 0
+
+    const dropdown = document.querySelector('#dropdown');
+    const selectedModel = dropdown.options[dropdown.selectedIndex].value;
+    console.log(selectedModel);
 
     const messageItem =document.createElement('li');
     messageItem.classList.add('message','sent');
@@ -122,12 +130,13 @@
       .then(response => response.json())
       .then(data => {
         const response = data.response;
+        const selectedModel =data.selectedModel;
         const messageItem = document.createElement('li');
         messageItem.classList.add('message', 'received');
         messageItem.innerHTML = `
         <div class="message-text">
             <div class="message-sender">
-              <b>AI Chatbot</b>
+              <b>${selectedModel}</b>
             </div>
             <div class="message-content">
                 ${response}

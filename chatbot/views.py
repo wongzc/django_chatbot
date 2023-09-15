@@ -15,18 +15,31 @@ from .api_keys import API_KEY # use your own API key :P
 
 openai.api_key=API_KEY
 
-def ask_openai(message):
+def ask_gpt(message, model):
     response =openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model=model,
         messages=[
             {"role":"system", "content":"You are a helpful assistant."},
             {"role": "user", "content": message},
         ]
     )
-    print(response)
+    #print(response)
 
-    #answer =response.choices[0].text.strip()
     answer=response.choices[0].message.content.strip()
+    return answer
+
+def ask_text(message, model):
+    response =openai.Completion.create(
+        model=model,
+        prompt=message,
+        max_tokens=150,
+        n=1,
+        stop=None,
+        temperature=0.7,
+    )
+    #print(response)
+
+    answer =response.choices[0].text.strip()
     return answer
 
 def chatbot(request):
@@ -38,11 +51,14 @@ def chatbot(request):
         message=request.POST.get('message')
         selectedModel=request.POST.get('selectedModel')
         print(selectedModel)
-        response=ask_openai(message)
+        if selectedModel == 'gpt-3.5-turbo' or selectedModel == 'gpt-4':
+            response=ask_gpt(message, selectedModel)
+        else:
+            response=ask_text(message, selectedModel)
 
         chat=Chat(user=request.user, message=message, response=response, created_at=timezone.now)
         chat.save()
-        return JsonResponse({'response':response,'message':message})
+        return JsonResponse({'response':response,'message':message, 'selectedModel': selectedModel})
     return render(request, 'chatbot.html',context)
 
 def login(request):
