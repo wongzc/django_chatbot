@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 import openai
 
-from django.contrib import auth
+from django.contrib import auth, messages
 from django.contrib.auth.models import User
 from .models import Chat
 
@@ -43,7 +43,11 @@ def ask_text(message, model):
     return answer
 
 def chatbot(request):
-    chats= Chat.objects.filter(user=request.user)
+    if request.user.is_authenticated:
+        chats= Chat.objects.filter(user=request.user)
+    else:
+        messages.error(request, 'Please login before using this tool!!')
+        return redirect('login')
     context={
         'chats':chats
     }

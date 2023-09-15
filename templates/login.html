@@ -69,6 +69,16 @@
 {% endblock %}
 
 {% block content %}
+
+{% if messages %} <!--template copy from django flash message-->
+<ul class="messages">
+    {% for message in messages %}
+    <h2 style="color:red">{{ message }}</h2>
+        {% endfor %}
+</ul>
+{% endif %}
+
+
 <div class="login-container">
   <div class="card">
     <div class="card-header">Login</div>
