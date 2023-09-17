@@ -11,15 +11,19 @@ from django.utils import timezone
 
 from .api_keys import API_KEY # use your own API key :P
 # Create your views here.
+
+#model & price input, output
 modelavailable={
-    "gpt-4":[0.03,0.06],
     "gpt-3.5-turbo":[0.0015 ,0.002],
+    "gpt-3.5 chat":[0.0015 ,0.002],
+    "gpt-4":[0.03,0.06],
     "text-ada-001":[0.0001,0.0001],
     "text-babbage-001":[0.0004,0.0004],
     "text-curie-001":[0.0020,0.0020],
     "text-davinci-003":[0.0020,0.0020]}
 
 
+#get own api key
 openai.api_key=API_KEY
 
 def ask_gpt(message, model):
@@ -46,6 +50,15 @@ def ask_text(message, model):
     print(response)
     return response
 
+def chat_gpt(messages, model):
+    response =openai.ChatCompletion.create(
+        model=model,
+        messages=messages
+    )
+    print(response)
+    return response
+
+
 def chatbot(request):
     if request.user.is_authenticated:
         chats= Chat.objects.filter(user=request.user)
@@ -62,6 +75,17 @@ def chatbot(request):
         
         if selectedModel == 'gpt-3.5-turbo' or selectedModel == 'gpt-4':
             response=ask_gpt(message, selectedModel)
+            answer=response.choices[0].message.content.strip()
+            modelrole=response.choices[0].message.role
+        elif selectedModel =='gpt-3.5 chat':
+            chat=Chat.objects.filter(user=request.user)
+            messages=[
+            {"role":"system", "content":"You are a helpful assistant."},]
+            for i in chat:
+                messages.append({"role": "user", "content": i.message})
+                messages.append( {"role":"system", "content":i.response})
+            messages.append({"role": "user", "content": message})
+            response=chat_gpt(messages, 'gpt-3.5-turbo')
             answer=response.choices[0].message.content.strip()
             modelrole=response.choices[0].message.role
         else:
@@ -83,6 +107,8 @@ def chatbot(request):
         chat.save()
         return JsonResponse({'response':answer,'message':message, 'selectedModel': selectedModel})
     return render(request, 'chatbot.html',context)
+
+
 
 def login(request):
     if request.method=='POST':
