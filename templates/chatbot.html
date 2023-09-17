@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
-
+{% block title %}
+Django Chatbot
+{% endblock %}
 {% block content %}
 <div class="chat-container">
-  
+
   <div class="card flex-grow-1">
 
     <div class="card-body messages-box">
@@ -35,7 +37,7 @@
         <li class="message received">
           <div class="message-text">
             <div class="message-sender">
-              <b>AI Chatbot</b>
+              <b>{{chat.selectedmodel}}</b>
             </div>
             <div class="message-content">
               {{chat.response}}
@@ -57,13 +59,9 @@
     
     <div class="input-group">
       <select id="dropdown" name="model">
-        <option value="gpt-4">gpt-4</option>
-        <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
-        
-        <option value="text-ada-001">text-ada-001</option>
-        <option value="text-babbage-001">text-babbage-001</option>
-        <option value="text-curie-001">text-curie-001</option>
-        <option value="text-davinci-003">text-davinci-003</option>
+        {% for modela in modelavailable %}
+        <option value="{{modela}}">{{modela}}</option>
+        {% endfor %}
     </select>
       <div class="input-group-append">
         <a class="btn btn-primary btn-send text-white" href="{% url 'delete' %}">
@@ -106,7 +104,7 @@
     messageItem.innerHTML=`
     <div class="message-text">
       <div class="message-sender">
-        <a>{{request.user}}<a>
+        <b>{{request.user}}</b>
       </div>
       <div class="message-content">
         ${message}

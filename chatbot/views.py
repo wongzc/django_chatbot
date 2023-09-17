@@ -11,6 +11,13 @@ from django.utils import timezone
 
 from .api_keys import API_KEY # use your own API key :P
 # Create your views here.
+modelavailable={
+    "gpt-4":[0.03,0.06],
+    "gpt-3.5-turbo":[0.0015 ,0.002],
+    "text-ada-001":[0.0001,0.0001],
+    "text-babbage-001":[0.0004,0.0004],
+    "text-curie-001":[0.0020,0.0020],
+    "text-davinci-003":[0.0020,0.0020]}
 
 
 openai.api_key=API_KEY
@@ -18,15 +25,14 @@ openai.api_key=API_KEY
 def ask_gpt(message, model):
     response =openai.ChatCompletion.create(
         model=model,
+        max_tokens=150,
         messages=[
             {"role":"system", "content":"You are a helpful assistant."},
             {"role": "user", "content": message},
         ]
     )
-    #print(response)
-
-    answer=response.choices[0].message.content.strip()
-    return answer
+    print(response)
+    return response
 
 def ask_text(message, model):
     response =openai.Completion.create(
@@ -37,10 +43,8 @@ def ask_text(message, model):
         stop=None,
         temperature=0.7,
     )
-    #print(response)
-
-    answer =response.choices[0].text.strip()
-    return answer
+    print(response)
+    return response
 
 def chatbot(request):
     if request.user.is_authenticated:
@@ -49,20 +53,35 @@ def chatbot(request):
         messages.error(request, 'Please login before using this tool!!')
         return redirect('login')
     context={
-        'chats':chats
+        'chats':chats,
+        'modelavailable':modelavailable,
     }
     if request.method=='POST':
         message=request.POST.get('message')
         selectedModel=request.POST.get('selectedModel')
-        print(selectedModel)
+        
         if selectedModel == 'gpt-3.5-turbo' or selectedModel == 'gpt-4':
             response=ask_gpt(message, selectedModel)
+            answer=response.choices[0].message.content.strip()
+            modelrole=response.choices[0].message.role
         else:
             response=ask_text(message, selectedModel)
+            answer=response.choices[0].text.strip()
+            modelrole=''
 
-        chat=Chat(user=request.user, message=message, response=response, created_at=timezone.now)
+        chat=Chat(
+            user=request.user, 
+            message=message, 
+            response=answer, 
+            created_at=timezone.now, 
+            selectedmodel=selectedModel,
+            prompt_tokens=response.usage.prompt_tokens,
+            completion_tokens=response.usage.completion_tokens,
+            total_tokens=response.usage.total_tokens,
+            modelrole=modelrole
+            )
         chat.save()
-        return JsonResponse({'response':response,'message':message, 'selectedModel': selectedModel})
+        return JsonResponse({'response':answer,'message':message, 'selectedModel': selectedModel})
     return render(request, 'chatbot.html',context)
 
 def login(request):
@@ -110,3 +129,16 @@ def delete(request):
         chat.delete()
         return redirect('chatbot')
     return render(request, 'delete.html')
+
+
+def calprice(abc):
+    price=0
+    pricetable={
+        "gpt-4",
+        "gpt-3.5-turbo",
+        "text-ada-001",
+        "text-babbage-001",
+        "text-curie-001",
+        "text-davinci-003"
+    }
+    return price
