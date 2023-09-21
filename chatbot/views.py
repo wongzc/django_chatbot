@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 import openai
 
-from django.contrib import auth, messages
+from django.contrib import auth
+import django
 from django.contrib.auth.models import User
 from .models import Chat
 
@@ -14,8 +15,8 @@ from .api_keys import API_KEY # use your own API key :P
 
 #model & price input, output
 modelavailable={
-    "gpt-3.5-turbo":[0.0015 ,0.002],
     "gpt-3.5 chat":[0.0015 ,0.002],
+    "gpt-3.5-turbo":[0.0015 ,0.002],
     "gpt-4":[0.03,0.06],
     "text-ada-001":[0.0001,0.0001],
     "text-babbage-001":[0.0004,0.0004],
@@ -63,7 +64,7 @@ def chatbot(request):
     if request.user.is_authenticated:
         chats= Chat.objects.filter(user=request.user)
     else:
-        messages.error(request, 'Please login before using this tool!!')
+        django.contrib.messages.error(request, 'Please login before using this tool!!')
         return redirect('login')
     context={
         'chats':chats,
@@ -80,7 +81,7 @@ def chatbot(request):
         elif selectedModel =='gpt-3.5 chat':
             chat=Chat.objects.filter(user=request.user)
             messages=[
-            {"role":"system", "content":"You are a helpful assistant."},]
+            {"role":"system", "content":"You are a helpful assistant. Please reply eveything in consice and short answer."},]
             for i in chat:
                 messages.append({"role": "user", "content": i.message})
                 messages.append( {"role":"system", "content":i.response})
