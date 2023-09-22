@@ -77,12 +77,12 @@ Django Chatbot
                             </div>
                         </div>
                         {% for modela in modelavailable %}
-                        <a href="#" class="list-group-item list-group-item-action border-0">
+                        <a href="#" class="list-group-item list-group-item-action border-0 model-link" id="selectedmodel-{{ forloop.counter }}" data-target-div="div-{{ forloop.counter }}">
                             <div class="badge bg-success float-right">5</div>
                             <div class="d-flex align-items-start">
                                 <img src="https://bootdey.com/img/Content/avatar/avatar5.png" class="rounded-circle mr-1" alt="Vanessa Tucker" width="40" height="40">
-                                <div class="flex-grow-1 ml-3">
-                                    {{modela}}
+                                <div class="flex-grow-1 ml-3" >
+                                    <div id="div-{{ forloop.counter }}" class="associated-div">{{modela}}</div>
                                     <div class="small"><span class="fas fa-circle chat-online"></span> Online</div>
                                 </div>
                             </div>
@@ -101,7 +101,7 @@ Django Chatbot
                                     <img src="https://bootdey.com/img/Content/avatar/avatar3.png" class="rounded-circle mr-1" alt="Sharon Lessman" width="40" height="40">
                                 </div>
                                 <div class="flex-grow-1 pl-3">
-                                    <strong>Sharon Lessman</strong>
+                                    <strong id="choosemodell">Sharon Lessman</strong>
                                     <div class="text-muted small"><em>Typing...</em></div>
                                 </div>
                                 <div>
@@ -173,11 +173,7 @@ Django Chatbot
                         <form class="message-formm">
                             {%csrf_token%}
                         <div class="flex-grow-0 py-3 px-4 border-top">
-                            <select id="dropdown" name="model">
-                                {% for modela in modelavailable %}
-                                <option value="{{modela}}">{{modela}}</option>
-                                {% endfor %}
-                            </select>
+
                             <div class="input-group">
                                 <input type="text" class="form-control message-input" placeholder="Type your message...">
                                 <button type="submit" class="btn btn-primary">Send</button>
@@ -205,10 +201,8 @@ Django Chatbot
     const messageForm = document.querySelector('.message-formm');
     const messageInput = document.querySelector('.message-input');
     var selectedModel;
+    var choosemodels=document.querySelectorAll(".model-link");
   
-    function getSelectedValue() {
-      
-          }
   
     messageForm.addEventListener('submit', (event)=>{
       event.preventDefault();
@@ -216,12 +210,12 @@ Django Chatbot
       const message =messageInput.value.trim();
       if (message.length === 0) {
         return;
-      } //makesure not 0
-  
-      const dropdown = document.querySelector('#dropdown');
-      const selectedModel = dropdown.options[dropdown.selectedIndex].value;
+      } 
+
+      const selectedModelDiv = document.getElementById("choosemodell");
+      const selectedModel = selectedModelDiv.textContent.trim();
       console.log(selectedModel);
-  
+
       const messageItem =document.createElement('li');
       messageItem.innerHTML=`
       <div class="chat-message-right pb-4">
@@ -269,5 +263,15 @@ Django Chatbot
           messagesList.appendChild(messageItem);
         });
     });
+    choosemodels.forEach(function(element) {
+        element.addEventListener('click', (event)=>{
+        event.preventDefault();
+        var targetDivId = element.getAttribute("data-target-div");
+        var associatedDiv = document.getElementById(targetDivId);
+        var choosenmodel = associatedDiv.textContent.trim();
+        $(choosemodell).text(choosenmodel);
+    });
+    })
+    
   </script>
 {% endblock %}
