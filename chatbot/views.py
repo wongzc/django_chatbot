@@ -64,7 +64,7 @@ def chatbot(request):
     if request.user.is_authenticated:
         chats= Chat.objects.filter(user=request.user)
     else:
-        django.contrib.messages.error(request, 'Please login before using this tool!!')
+        django.contrib.messages.error(request, 'Please login to use the full function of this tool.')
         return redirect('login')
     context={
         'chats':chats,
@@ -107,7 +107,7 @@ def chatbot(request):
             )
         chat.save()
         return JsonResponse({'response':answer,'message':message, 'selectedModel': selectedModel})
-    return render(request, 'chatbot.html',context)
+    return render(request, 'chatbot_v2.html',context)
 
 
 
