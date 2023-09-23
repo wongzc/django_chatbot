@@ -82,7 +82,7 @@ def chatbot(request):
             answer=response.choices[0].message.content.strip()
             modelrole=response.choices[0].message.role
         elif selectedModel =='gpt-3.5 chat':
-            chat=Chat.objects.filter(user=request.user)
+            chat=Chat.objects.filter(user=request.user, selectedmodel='gpt-3.5 chat')
             messages=[
             {"role":"system", "content":"You are a helpful assistant. Please reply eveything in consice and short answer."},]
             for i in chat:
@@ -120,7 +120,7 @@ def changemodel(request):
         chats= Chat.objects.filter(user=request.user, selectedmodel=selectmodel)
         serialized_data = serialize("json", chats)
         data={
-        'chats':serialized_data
+        "chats":serialized_data
         }
         print(data)
         return JsonResponse(data)

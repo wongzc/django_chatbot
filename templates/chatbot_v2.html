@@ -78,12 +78,12 @@ Django Chatbot
                         </div>
                         {% for modela in modelavailable %}
                         <a href="" class="list-group-item list-group-item-action border-0 model-link" id="selectedmodel-{{ forloop.counter }}" data-target-div="div-{{ forloop.counter }}">
-                            <div class="badge bg-success float-right">5</div>
+                            <!-- <div class="badge bg-success float-right">5</div> -->
                             <div class="d-flex align-items-start">
                                 <img src="https://bootdey.com/img/Content/avatar/avatar5.png" class="rounded-circle mr-1" alt="Vanessa Tucker" width="40" height="40">
                                 <div class="flex-grow-1 ml-3" >
                                     <div id="div-{{ forloop.counter }}" class="associated-div">{{modela}}</div>
-                                    <div class="small"><span class="fas fa-circle chat-online"></span> Online</div>
+                                    <!-- <div class="small"><span class="fas fa-circle chat-online"></span> Online</div> -->
                                 </div>
                             </div>
                         </a>
@@ -273,10 +273,42 @@ Django Chatbot
             url:"/changemodel",
             data:{selectmodel:choosenmodel},
             success: function(data){
-                console.log("AJAX request successful");
-                console.log("Response data:", data);
                 $(choosemodell).text(choosenmodel);
                 messagesList.innerHTML = '';
+                var chats = JSON.parse(data.chats);
+                for (var i = 0; i < chats.length; i++) {
+                    var chat = chats[i];  
+                    var message = chat.fields.message;
+                    var response = chat.fields.response;
+                    var selectedmodel = chat.fields.selectedmodel;
+                    const messageItem =document.createElement('li');
+                    messageItem.innerHTML=`
+                    <div class="chat-message-right pb-4">
+                            <div>
+                                <img src="https://bootdey.com/img/Content/avatar/avatar1.png" class="rounded-circle mr-1" alt="Chris Wood" width="40" height="40">
+                                <div class="text-muted small text-nowrap mt-2"></div>
+                            </div>
+                            <div class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">
+                                <div class="font-weight-bold mb-1">{{request.user}}</div>
+                                ${message}
+                            </div>
+                        </div>`;
+                    messagesList.appendChild(messageItem);
+                    const responseItem =document.createElement('li');
+                    responseItem.innerHTML= `
+                        <div class="chat-message-left pb-4">
+                            <div>
+                                <img src="https://bootdey.com/img/Content/avatar/avatar3.png" class="rounded-circle mr-1" alt="Sharon Lessman" width="40" height="40">
+                                <div class="text-muted small text-nowrap mt-2">{{chat.created_at|time:"h:i A"}}</div>
+                            </div>
+                            <div class="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">
+                                <div class="font-weight-bold mb-1">${selectedmodel}</div>
+                                ${response}
+                            </div>
+                        </div>
+                        `;
+                    messagesList.appendChild(responseItem);
+                }
             },
             error: function (error) {
                 console.error('Error:', error);
