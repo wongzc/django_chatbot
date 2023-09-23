@@ -18,11 +18,16 @@ from .api_keys import API_KEY # use your own API key :P
 openai.api_key=API_KEY
 
 def ask_gpt(message, model):
+    if model =="gpt-3.5-turbo":
+        name="Belinda"
+    elif model =="gpt-4":
+        name="Chris"
+    instruction="You are a helpful assistant. Please reply in consice and short. Your name is "+name
     response =openai.ChatCompletion.create(
         model=model,
         max_tokens=150,
         messages=[
-            {"role":"system", "content":"You are a helpful assistant."},
+            {"role":"system", "content": instruction},
             {"role": "user", "content": message},
         ]
     )
@@ -73,7 +78,7 @@ def chatbot(request):
         elif selectedModel =='gpt-3.5 chat':
             chat=Chat.objects.filter(user=request.user, selectedmodel=Chatmodel.objects.get(name='gpt-3.5 chat')) 
             messages=[
-            {"role":"system", "content":"You are a helpful assistant. Please reply eveything in consice and short answer."},]
+            {"role":"system", "content":"You are a helpful assistant. Please reply in consice and short. Your name is Amanda."},]
             for i in chat:
                 messages.append({"role": "user", "content": i.message})
                 messages.append( {"role":"system", "content":i.response})

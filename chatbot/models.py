@@ -7,6 +7,7 @@ class Chatmodel(models.Model):
     outputprice=models.FloatField()
     profilepic=models.ImageField(null=True, default="avatar.svg")
     greeting=models.TextField(null=True, default="Hi, I am, you can ask me anything.")
+    cutename=models.TextField(null=True, default="")
 
     def __str__(self):
         return self.name

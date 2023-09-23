@@ -81,10 +81,10 @@ Django Chatbot
                         <a href="" class="list-group-item list-group-item-action border-0 model-link" id="selectedmodel-{{ forloop.counter }}" data-target-div="div-{{ forloop.counter }}">
                             <!-- <div class="badge bg-success float-right">5</div> -->
                             <div class="d-flex align-items-start">
-                                <img src="{{modela.profilepic.url}}" class="rounded-circle mr-1" alt="Vanessa Tucker" width="40" height="40">
+                                <img src="{{modela.profilepic.url}}" class="rounded-circle mr-1" alt="Vanessa Tucker" width="45" height="45">
                                 <div class="flex-grow-1 ml-3" >
-                                    <div id="div-{{ forloop.counter }}" class="associated-div">{{modela.name}}</div>
-                                    <!-- <div class="small"><span class="fas fa-circle chat-online"></span> Online</div> -->
+                                    <div class="">{{modela.cutename}}</div>
+                                    <div id="div-{{ forloop.counter }}" class="small associated-div" ><span class="fas fa-circle chat-online "></span> {{modela.name}}</div>
                                 </div>
                             </div>
                         </a>
@@ -129,7 +129,7 @@ Django Chatbot
                                             </div>
                                             <div class="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">
                                                 <div class="font-weight-bold mb-1">{{firstmodel.name}}</div>
-                                                Hi {{request.user}}, I am {{firstmodel.name}}, you can ask me anything.
+                                                Hi {{request.user}}, I am {{firstmodel.cutename}}, you can ask me anything.
                                             </div>
                                         </div>
                                     </li>
