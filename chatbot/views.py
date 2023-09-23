@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 import openai
-
+from django.core.serializers import serialize
 from django.contrib import auth
 import django
 from django.contrib.auth.models import User
@@ -22,6 +22,8 @@ modelavailable={
     "text-babbage-001":[0.0004,0.0004],
     "text-curie-001":[0.0020,0.0020],
     "text-davinci-003":[0.0020,0.0020]}
+
+modellis=list(modelavailable.keys())
 
 
 #get own api key
@@ -62,13 +64,14 @@ def chat_gpt(messages, model):
 
 def chatbot(request):
     if request.user.is_authenticated:
-        chats= Chat.objects.filter(user=request.user)
+        chats= Chat.objects.filter(user=request.user, selectedmodel=modellis[0])
     else:
         django.contrib.messages.error(request, 'Please login to use the full function of this tool.')
         return redirect('login')
     context={
         'chats':chats,
         'modelavailable':modelavailable,
+        'firstmodel':modellis[0]
     }
     if request.method=='POST':
         message=request.POST.get('message')
@@ -107,8 +110,20 @@ def chatbot(request):
             )
         chat.save()
         return JsonResponse({'response':answer,'message':message, 'selectedModel': selectedModel})
+    
     return render(request, 'chatbot_v2.html',context)
 
+def changemodel(request):
+    if request.method=='GET':
+        
+        selectmodel=request.GET['selectmodel']
+        chats= Chat.objects.filter(user=request.user, selectedmodel=selectmodel)
+        serialized_data = serialize("json", chats)
+        data={
+        'chats':serialized_data
+        }
+        print(data)
+        return JsonResponse(data)
 
 
 def login(request):
