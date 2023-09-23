@@ -1,12 +1,23 @@
 from django.db import models
 from django.contrib.auth.models import User
 # Create your models here.
+class Chatmodel(models.Model):
+    name=models.TextField()
+    inputprice=models.FloatField()
+    outputprice=models.FloatField()
+    profilepic=models.ImageField(null=True, default="avatar.svg")
+
+    def __str__(self):
+        return self.name
+
+
 class Chat(models.Model):
     user=models.ForeignKey(User, on_delete=models.CASCADE)
     message=models.TextField()
     response=models.TextField()
     created_at=models.DateTimeField(auto_now_add=True)
-    selectedmodel=models.TextField(default="AI Chatbot")
+    # selectedmodel=models.TextField(default="AI Chatbot")
+    selectedmodel=models.ForeignKey(Chatmodel, on_delete=models.SET_NULL, null=True)
     prompt_tokens=models.IntegerField(default=0)
     completion_tokens=models.IntegerField(default=0)
     total_tokens=models.IntegerField(default=0)
@@ -14,3 +25,4 @@ class Chat(models.Model):
 
     def __str__(self):
         return f'{self.user.username}:{self.message}'
+    

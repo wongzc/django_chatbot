@@ -5,7 +5,7 @@ from django.core.serializers import serialize
 from django.contrib import auth
 import django
 from django.contrib.auth.models import User
-from .models import Chat
+from .models import Chat, Chatmodel
 
 from django.utils import timezone
 
@@ -64,14 +64,14 @@ def chat_gpt(messages, model):
 
 def chatbot(request):
     if request.user.is_authenticated:
-        chats= Chat.objects.filter(user=request.user, selectedmodel=modellis[0])
+        chats= Chat.objects.filter(user=request.user, selectedmodel=Chatmodel.objects.first()) 
     else:
         django.contrib.messages.error(request, 'Please login to use the full function of this tool.')
         return redirect('login')
     context={
         'chats':chats,
         'modelavailable':modelavailable,
-        'firstmodel':modellis[0]
+        'firstmodel':Chatmodel.objects.first().name
     }
     if request.method=='POST':
         message=request.POST.get('message')
@@ -82,7 +82,7 @@ def chatbot(request):
             answer=response.choices[0].message.content.strip()
             modelrole=response.choices[0].message.role
         elif selectedModel =='gpt-3.5 chat':
-            chat=Chat.objects.filter(user=request.user, selectedmodel='gpt-3.5 chat')
+            chat=Chat.objects.filter(user=request.user, selectedmodel=Chatmodel.objects.get(name='gpt-3.5 chat')) 
             messages=[
             {"role":"system", "content":"You are a helpful assistant. Please reply eveything in consice and short answer."},]
             for i in chat:
@@ -102,7 +102,7 @@ def chatbot(request):
             message=message, 
             response=answer, 
             created_at=timezone.now, 
-            selectedmodel=selectedModel,
+            selectedmodel=Chatmodel.objects.get(name=selectedModel),
             prompt_tokens=response.usage.prompt_tokens,
             completion_tokens=response.usage.completion_tokens,
             total_tokens=response.usage.total_tokens,
@@ -117,7 +117,7 @@ def changemodel(request):
     if request.method=='GET':
         
         selectmodel=request.GET['selectmodel']
-        chats= Chat.objects.filter(user=request.user, selectedmodel=selectmodel)
+        chats= Chat.objects.filter(user=request.user, selectedmodel=Chatmodel.objects.get(name=selectmodel))
         serialized_data = serialize("json", chats)
         data={
         "chats":serialized_data
