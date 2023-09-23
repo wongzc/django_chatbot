@@ -102,8 +102,8 @@ Django Chatbot
                                     <img src="{{firstmodel.profilepic.url}}" class="rounded-circle mr-1" alt="Sharon Lessman" width="50" height="50" id="topbarimage">
                                 </div>
                                 <div class="flex-grow-1 pl-3">
-                                    <strong id="choosemodell">{{firstmodel.name}}</strong>
-                                    <div class="text-muted small"><em>Online</em></div>
+                                    <strong id="choosemodelname">{{firstmodel.cutename}}</strong>
+                                    <div id="choosemodell" class="text-muted small"><em>{{firstmodel.name}}</em></div>
                                 </div>
                                 <div>
                                     <a class="btn btn-danger btn-lg mr-1 px-3" href="{% url 'clear' firstmodel.id%}" id="clearchat">
@@ -128,7 +128,7 @@ Django Chatbot
                                                 <div class="text-muted small text-nowrap mt-2"></div>
                                             </div>
                                             <div class="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">
-                                                <div class="font-weight-bold mb-1">{{firstmodel.name}}</div>
+                                                <div class="font-weight-bold mb-1">{{firstmodel.cutename}}</div>
                                                 Hi {{request.user}}, I am {{firstmodel.cutename}}, you can ask me anything.
                                             </div>
                                         </div>
@@ -155,7 +155,7 @@ Django Chatbot
                                             <div class="text-muted small text-nowrap mt-2">{{chat.created_at|time:"h:i A"}}</div>
                                         </div>
                                         <div class="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">
-                                            <div class="font-weight-bold mb-1">{{chat.selectedmodel}}</div>
+                                            <div class="font-weight-bold mb-1">{{chat.selectedmodel.cutename}}</div>
                                             {{chat.response}}
                                         </div>
                                     </div>
@@ -243,6 +243,7 @@ Django Chatbot
           const response = data.response;
           const pic = data.pic;
           const selectedModel =data.selectedModel;
+          const cutename =data.chatmodel.cutename;
           const messageItem = document.createElement('li');
           messageItem.innerHTML = `
             <div class="chat-message-left pb-4">
@@ -251,7 +252,7 @@ Django Chatbot
                     <div class="text-muted small text-nowrap mt-2">{{chat.created_at|time:"h:i A"}}</div>
                 </div>
                 <div class="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">
-                    <div class="font-weight-bold mb-1">${selectedModel}</div>
+                    <div class="font-weight-bold mb-1">${cutename}</div>
                     ${response}
                 </div>
             </div>
@@ -274,14 +275,16 @@ Django Chatbot
             url:"/changemodel",
             data:{selectmodel:choosenmodel},
             success: function(data){
-                $(choosemodell).text(choosenmodel);
                 messagesList.innerHTML = '';
                 var chats = JSON.parse(data.chats);
                 var pic=data.pic
-                var id=data.id
+                var id=data.chatmodel.id
+                var cutename=data.chatmodel.cutename
                 var newurl="{% url 'clear' 1 %}".replace('1', id);
                 $("#clearchat").attr("href", newurl);
                 $("#topbarimage").attr("src", pic);
+                $(choosemodelname).text(cutename);
+                $(choosemodell).text(choosenmodel);
                 const firstItem =document.createElement('li');
                 firstItem.innerHTML= `
                         <div class="chat-message-left pb-4">
@@ -290,8 +293,8 @@ Django Chatbot
                                 <div class="text-muted small text-nowrap mt-2">{{chat.created_at|time:"h:i A"}}</div>
                             </div>
                             <div class="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">
-                                <div class="font-weight-bold mb-1">${choosenmodel}</div>
-                                Hi {{request.user}}, I am ${choosenmodel}, you can ask me anything.
+                                <div class="font-weight-bold mb-1">${cutename}</div>
+                                Hi {{request.user}}, I am ${cutename}, you can ask me anything.
                             </div>
                         </div>
                         `;
@@ -323,7 +326,7 @@ Django Chatbot
                                 <div class="text-muted small text-nowrap mt-2">{{chat.created_at|time:"h:i A"}}</div>
                             </div>
                             <div class="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">
-                                <div class="font-weight-bold mb-1">${choosenmodel}</div>
+                                <div class="font-weight-bold mb-1">${cutename}</div>
                                 ${response}
                             </div>
                         </div>

@@ -6,7 +6,7 @@ from django.contrib import auth
 import django
 from django.contrib.auth.models import User
 from .models import Chat, Chatmodel
-
+from django.forms.models import model_to_dict
 from django.utils import timezone
 
 
@@ -92,6 +92,8 @@ def chatbot(request):
             modelrole=''
 
         selectedmodel=Chatmodel.objects.get(name=selectedModel)
+        chatmodel=model_to_dict(selectedmodel)
+        chatmodel.pop('profilepic')
         chat=Chat(
             user=request.user, 
             message=message, 
@@ -104,8 +106,15 @@ def chatbot(request):
             modelrole=modelrole
             )
         chat.save()
+        print(chatmodel)
         pic=selectedmodel.profilepic.url
-        return JsonResponse({'response':answer,'message':message, 'selectedModel': selectedModel, 'pic': pic})
+        context={
+            'response':answer,
+            'message':message, 
+            'chatmodel':chatmodel,
+            'selectedModel': selectedModel, 
+            'pic': pic}
+        return JsonResponse(context)
     
     return render(request, 'chatbot_v2.html',context)
 
@@ -117,13 +126,13 @@ def changemodel(request):
         chats= Chat.objects.filter(user=request.user, selectedmodel=selectedmodel)
         serialized_data = serialize("json", chats)
         pic=selectedmodel.profilepic.url
-        id=selectedmodel.id
+        chatmodel=model_to_dict(selectedmodel)
+        chatmodel.pop('profilepic')
         data={
         "chats":serialized_data,
         "pic":pic,
-        "id":id
+        "chatmodel":chatmodel,
         }
-        print(data)
         return JsonResponse(data)
 
 
