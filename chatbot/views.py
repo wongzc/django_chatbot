@@ -86,19 +86,21 @@ def chatbot(request):
             answer=response.choices[0].text.strip()
             modelrole=''
 
+        selectedmodel=Chatmodel.objects.get(name=selectedModel)
         chat=Chat(
             user=request.user, 
             message=message, 
             response=answer, 
             created_at=timezone.now, 
-            selectedmodel=Chatmodel.objects.get(name=selectedModel),
+            selectedmodel=selectedmodel,
             prompt_tokens=response.usage.prompt_tokens,
             completion_tokens=response.usage.completion_tokens,
             total_tokens=response.usage.total_tokens,
             modelrole=modelrole
             )
         chat.save()
-        return JsonResponse({'response':answer,'message':message, 'selectedModel': selectedModel})
+        pic=selectedmodel.profilepic.url
+        return JsonResponse({'response':answer,'message':message, 'selectedModel': selectedModel, 'pic': pic})
     
     return render(request, 'chatbot_v2.html',context)
 
@@ -110,10 +112,11 @@ def changemodel(request):
         chats= Chat.objects.filter(user=request.user, selectedmodel=selectedmodel)
         serialized_data = serialize("json", chats)
         pic=selectedmodel.profilepic.url
-        print(pic)
+        id=selectedmodel.id
         data={
         "chats":serialized_data,
         "pic":pic,
+        "id":id
         }
         print(data)
         return JsonResponse(data)
@@ -158,22 +161,14 @@ def logout(request):
     auth.logout(request)
     return redirect('login')
 
-def delete(request):
-    chat=Chat.objects.filter(user=request.user)
+def clear(request,pk):
+    chatmodel=Chatmodel.objects.get(id=pk)
+    chat=Chat.objects.filter(user=request.user, selectedmodel=chatmodel)
+    context={
+        'chatmodel':chatmodel,
+    }
     if request.method =='POST':
         chat.delete()
         return redirect('chatbot')
-    return render(request, 'delete.html')
+    return render(request, 'clear.html', context)
 
-
-def calprice(abc):
-    price=0
-    pricetable={
-        "gpt-4",
-        "gpt-3.5-turbo",
-        "text-ada-001",
-        "text-babbage-001",
-        "text-curie-001",
-        "text-davinci-003"
-    }
-    return price

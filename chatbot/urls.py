@@ -5,7 +5,7 @@ urlpatterns =[
     path('login', views.login, name='login'),
     path('register', views.register, name='register'),
     path('logout', views.logout, name='logout'),
-    path('delete', views.delete, name='delete'),
+    path('clear/<str:pk>', views.clear, name='clear'),
 
     path('changemodel', views.changemodel, name='changemodel'),
 ]
