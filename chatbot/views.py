@@ -13,18 +13,6 @@ from django.utils import timezone
 from .api_keys import API_KEY # use your own API key :P
 # Create your views here.
 
-#model & price input, output
-modelavailable={
-    "gpt-3.5 chat":[0.0015 ,0.002],
-    "gpt-3.5-turbo":[0.0015 ,0.002],
-    "gpt-4":[0.03,0.06],
-    "text-ada-001":[0.0001,0.0001],
-    "text-babbage-001":[0.0004,0.0004],
-    "text-curie-001":[0.0020,0.0020],
-    "text-davinci-003":[0.0020,0.0020]}
-
-modellis=list(modelavailable.keys())
-
 
 #get own api key
 openai.api_key=API_KEY
@@ -65,13 +53,14 @@ def chat_gpt(messages, model):
 def chatbot(request):
     if request.user.is_authenticated:
         chats= Chat.objects.filter(user=request.user, selectedmodel=Chatmodel.objects.first()) 
+        chatmodels=Chatmodel.objects.all()
     else:
         django.contrib.messages.error(request, 'Please login to use the full function of this tool.')
         return redirect('login')
     context={
         'chats':chats,
-        'modelavailable':modelavailable,
-        'firstmodel':Chatmodel.objects.first().name
+        'chatmodels':chatmodels,
+        'firstmodel':Chatmodel.objects.first()
     }
     if request.method=='POST':
         message=request.POST.get('message')
@@ -117,10 +106,14 @@ def changemodel(request):
     if request.method=='GET':
         
         selectmodel=request.GET['selectmodel']
-        chats= Chat.objects.filter(user=request.user, selectedmodel=Chatmodel.objects.get(name=selectmodel))
+        selectedmodel=Chatmodel.objects.get(name=selectmodel)
+        chats= Chat.objects.filter(user=request.user, selectedmodel=selectedmodel)
         serialized_data = serialize("json", chats)
+        pic=selectedmodel.profilepic.url
+        print(pic)
         data={
-        "chats":serialized_data
+        "chats":serialized_data,
+        "pic":pic,
         }
         print(data)
         return JsonResponse(data)
